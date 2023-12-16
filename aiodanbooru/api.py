@@ -3,7 +3,7 @@ from typing import List
 import aiohttp
 
 from aiodanbooru.models import DanbooruPost
-
+from logging import getLogger
 
 class DanbooruAPI:
     def __init__(self, base_url: str = "https://danbooru.donmai.us"):
