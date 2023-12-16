@@ -26,7 +26,7 @@ class DanbooruAPI:
             return await response.json()
 
     async def get_posts(
-        self, tags: List[str] = None, limit: int = None
+        self, tags: List[str] = None, limit: int = None, page: int = None
     ) -> List[DanbooruPost]:
         async with aiohttp.ClientSession() as session:
             endpoint = "/posts.json"
@@ -35,9 +35,44 @@ class DanbooruAPI:
                 params["tags"] = " ".join(tags)
             if limit is not None:
                 params["limit"] = str(limit)
+            if page is not None:
+                params["page"] = str(page)
             response = await self._get(session, endpoint, params)
-            posts = [DanbooruPost(**post) for post in response]
+            posts = []
+            for post in response:
+                posts.append(DanbooruPost(**post)) 
             return posts
+    
+    async def get_posts_pages(
+        self, tags: List[str] = None, limit: int = None, page_start: int = 1, page_end: int = 1
+    ) -> List[DanbooruPost]:
+        posts = []
+        for page in range(page_start, page_end + 1):
+            posts += await self.get_posts(tags=tags, limit=limit, page=page)
+        # remove duplicates with id
+        posts = list({post.id:post for post in posts}.values())
+        return posts
+    
+    async def get_all_posts(
+        self, tags: List[str] = None, limit: int = None
+    ) -> List[DanbooruPost]:
+        posts = []
+        page = 1
+        while True:
+            try:
+                new_posts = await self.get_posts(tags=tags, limit=limit, page=page)
+            except Exception as exception:
+                break # no more pages
+            if not new_posts:
+                break
+            posts += new_posts
+            page += 1
+        # remove duplicates with id
+        posts = list({post.id:post for post in posts}.values())
+        # limit
+        if limit is not None:
+            posts = posts[:limit]
+        return posts
 
     async def get_random_post(self) -> DanbooruPost:
         async with aiohttp.ClientSession() as session:
