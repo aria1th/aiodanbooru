@@ -6,16 +6,42 @@ from aiodanbooru.models import DanbooruPost
 from logging import getLogger
 
 class DanbooruAPI:
-    def __init__(self, base_url: str = "https://danbooru.donmai.us"):
+    def __init__(self, base_url: str = "https://danbooru.donmai.us", api_key: str = None, username: str = None):
         self.base_url = base_url
+        self.api_key = api_key
+        self.username = username
 
     async def _get(
         self, session: aiohttp.ClientSession, endpoint: str, params: dict = None
     ) -> dict:
+        # add api key to params
+        if params is None:
+            params = {}
+        if self.api_key is not None:
+            params["api_key"] = self.api_key
+            params["login"] = self.username
         url = self.base_url + endpoint
         async with session.get(url, params=params) as response:
             response.raise_for_status()
             return await response.json()
+    
+    async def get_post(
+        self, id: int
+    ) -> DanbooruPost:
+        #https://danbooru.donmai.us/posts/<id>.json
+        async with aiohttp.ClientSession() as session:
+            endpoint = f"/posts/{id}.json"
+            response = await self._get(session, endpoint)
+            post = DanbooruPost(**response)
+            return post
+    
+    async def get_posts_by_id(
+        self, ids: List[int]
+    ) -> List[DanbooruPost]:
+        posts = []
+        for id in ids:
+            posts.append(await self.get_post(id))
+        return posts
 
     async def _post(
         self, session: aiohttp.ClientSession, endpoint: str, data: dict
