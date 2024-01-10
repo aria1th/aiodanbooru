@@ -4,43 +4,7 @@ import aiohttp
 from pydantic import BaseModel, Field
 from pydantic.networks import HttpUrl
 
-class DanbooruPost(BaseModel):
-    id: int = Field(..., description="The ID of the post")
-    uploader_id: int = Field(..., description="The ID of the uploader")
-    approver_id: Optional[int] = Field(None, description="The ID of the approver")
-    tag_string: str = Field(..., description="The tags of the post")
-    tag_string_general: str = Field(..., description="The general tags of the post")
-    tag_string_artist: str = Field(..., description="The artist tags of the post")
-    tag_string_copyright: str = Field(..., description="Optional copyrights, such as animation")
-    tag_string_character: str = Field(..., description="The character tags of the post")
-    tag_string_meta: str = Field(..., description="The meta tags of the post")
-    rating: Optional[str] = Field(None, description="The rating of the post")
-    parent_id: Optional[int] = Field(None, description="The ID of the parent post")
-    source: Optional[str] = Field(None, description="The source of the post")
-    md5: Optional[str] = Field(None, description="MD5 hash of the media file")
-    file_url: Optional[HttpUrl] = Field(None, description="URL of the media file")
-    large_file_url: Optional[HttpUrl] = Field(
-        None, description="URL of the large version of the media file"
-    )
-    preview_file_url: Optional[HttpUrl] = Field(
-        None, description="URL of the preview version of the media file"
-    )
-    file_ext: Optional[str] = Field(None, description="The extension of the media file")
-    file_size: Optional[int] = Field(None, description="The size of the media file")
-    image_width: Optional[int] = Field(None, description="The width of the media file")
-    score: int = Field(..., description="The score of the post")
-    fav_count: int = Field(..., description="The number of favorites")
-    tag_count_general: int = Field(..., description="The number of general tags")
-    tag_count_artist: int = Field(..., description="The number of artist tags")
-    tag_count_copyright: int = Field(..., description="The number of copyrights")
-    tag_count_character: int = Field(..., description="The number of character tags")
-    tag_count_meta: int = Field(..., description="The number of meta tags")
-    last_comment_bumped_at: Optional[str] = Field(..., description="The last comment bumped at")
-    last_noted_at: Optional[str] = Field(..., description="The last noted at")
-    has_children: bool = Field(..., description="Whether the post has children")
-    image_height: Optional[int] = Field(None, description="The height of the media file")
-    created_at: str = Field(..., description="The time the post was created at")
-    updated_at: str = Field(..., description="The time the post was updated at")
+class AbstractPost(BaseModel):
 
     class Config:
         extra = "allow"
@@ -80,7 +44,7 @@ class DanbooruPost(BaseModel):
 
     @property
     def link(self):
-        return f"https://danbooru.donmai.us/posts/{self.id}"
+        return f"https://example.url/posts/{self.id}"
 
     @property
     def media_url(self):
@@ -121,3 +85,45 @@ class DanbooruPost(BaseModel):
         Returns all the other information except the media file.
         """
         return self.dict()
+
+class DanbooruPost(AbstractPost):
+    id: int = Field(..., description="The ID of the post")
+    uploader_id: int = Field(..., description="The ID of the uploader")
+    approver_id: Optional[int] = Field(None, description="The ID of the approver")
+    tag_string: str = Field(..., description="The tags of the post")
+    tag_string_general: str = Field(..., description="The general tags of the post")
+    tag_string_artist: str = Field(..., description="The artist tags of the post")
+    tag_string_copyright: str = Field(..., description="Optional copyrights, such as animation")
+    tag_string_character: str = Field(..., description="The character tags of the post")
+    tag_string_meta: str = Field(..., description="The meta tags of the post")
+    rating: Optional[str] = Field(None, description="The rating of the post")
+    parent_id: Optional[int] = Field(None, description="The ID of the parent post")
+    source: Optional[str] = Field(None, description="The source of the post")
+    md5: Optional[str] = Field(None, description="MD5 hash of the media file")
+    file_url: Optional[HttpUrl] = Field(None, description="URL of the media file")
+    large_file_url: Optional[HttpUrl] = Field(
+        None, description="URL of the large version of the media file"
+    )
+    preview_file_url: Optional[HttpUrl] = Field(
+        None, description="URL of the preview version of the media file"
+    )
+    file_ext: Optional[str] = Field(None, description="The extension of the media file")
+    file_size: Optional[int] = Field(None, description="The size of the media file")
+    image_width: Optional[int] = Field(None, description="The width of the media file")
+    score: int = Field(..., description="The score of the post")
+    fav_count: int = Field(..., description="The number of favorites")
+    tag_count_general: int = Field(..., description="The number of general tags")
+    tag_count_artist: int = Field(..., description="The number of artist tags")
+    tag_count_copyright: int = Field(..., description="The number of copyrights")
+    tag_count_character: int = Field(..., description="The number of character tags")
+    tag_count_meta: int = Field(..., description="The number of meta tags")
+    last_comment_bumped_at: Optional[str] = Field(..., description="The last comment bumped at")
+    last_noted_at: Optional[str] = Field(..., description="The last noted at")
+    has_children: bool = Field(..., description="Whether the post has children")
+    image_height: Optional[int] = Field(None, description="The height of the media file")
+    created_at: str = Field(..., description="The time the post was created at")
+    updated_at: str = Field(..., description="The time the post was updated at")
+
+    @property
+    def link(self):
+        return f"https://danbooru.donmai.us/posts/{self.id}"
