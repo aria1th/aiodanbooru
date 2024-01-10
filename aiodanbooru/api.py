@@ -10,6 +10,7 @@ class DanbooruAPI:
         self.base_url = base_url
         self.api_key = api_key
         self.username = username
+        self.POST_CLASS = DanbooruPost
 
     async def _get(
         self, session: aiohttp.ClientSession, endpoint: str, params: dict = None
@@ -32,7 +33,7 @@ class DanbooruAPI:
         async with aiohttp.ClientSession() as session:
             endpoint = f"/posts/{id}.json"
             response = await self._get(session, endpoint)
-            post = DanbooruPost(**response)
+            post = self.POST_CLASS(**response)
             return post
     
     async def get_posts_by_id(
@@ -66,7 +67,7 @@ class DanbooruAPI:
             response = await self._get(session, endpoint, params)
             posts = []
             for post in response:
-                posts.append(DanbooruPost(**post)) 
+                posts.append(self.POST_CLASS(**post)) 
             return posts
     
     async def get_posts_pages(
@@ -104,5 +105,5 @@ class DanbooruAPI:
         async with aiohttp.ClientSession() as session:
             endpoint = "/posts/random.json"
             response = await self._get(session, endpoint)
-            post = DanbooruPost(**response)
+            post = self.POST_CLASS(**response)
             return post
